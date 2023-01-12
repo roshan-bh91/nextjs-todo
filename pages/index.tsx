@@ -1,10 +1,10 @@
 import Head from "next/head";
-import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
-import { useTodos } from "../context/TodosProvider";
-import { EveryTodo } from "../types/todo.types";
-import { AddNewTodo } from "../components/AddNewTodo";
+import { useTodos, useModal } from "../context/";
+import { EveryTodo } from "../types/";
+import { AddNewTodo } from "../components";
+import { Archive, Delete, Edit, FillCheck } from "../icons";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,7 +14,9 @@ export default function Home() {
     deleteExistingTodo,
     transferExistingTodosBetweenPendingAndCompleted,
     transferExistingTodosBetweenArchivesAndPending,
+    updateTodoSelected,
   } = useTodos();
+  const { openModal } = useModal();
   return (
     <>
       <Head>
@@ -40,24 +42,32 @@ export default function Home() {
                   </li>
                   <button
                     onClick={() => {
+                      openModal();
+                      updateTodoSelected(everyEl);
+                    }}
+                  >
+                    <Edit/>
+                  </button>
+                  <button
+                    onClick={() => {
                       deleteExistingTodo(everyEl);
                     }}
                   >
-                    Delete
+                    <Delete/>
                   </button>
                   <button
                     onClick={() => {
                       transferExistingTodosBetweenArchivesAndPending(everyEl);
                     }}
                   >
-                    Archive
+                    <Archive/>
                   </button>
                   <button
                     onClick={() => {
                       transferExistingTodosBetweenPendingAndCompleted(everyEl);
                     }}
                   >
-                    mark as complete
+                    <FillCheck/>
                   </button>
                 </div>
               );

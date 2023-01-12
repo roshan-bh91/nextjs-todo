@@ -1,5 +1,13 @@
-import { useTodos } from "../../context/TodosProvider";
-import { EveryTodo } from "../../types/todo.types";
+import { useTodos, useModal } from "../../context";
+import { EveryTodo } from "../../types";
+import {
+  Archive,
+  Delete,
+  Edit,
+  FillCheck,
+  OutlineCheck,
+  Pending,
+} from "../../icons";
 
 const Archived = () => {
   const {
@@ -7,10 +15,17 @@ const Archived = () => {
     transferExistingTodosBetweenCompletedAndArchives,
     transferExistingTodosBetweenArchivesAndPending,
     deleteExistingTodo,
+    updateTodoSelected,
   } = useTodos();
+  const { openModal } = useModal();
   return (
     <>
-      <h4>Wekcome to the archived todos section</h4>
+      <h4 className="flex items-center">
+        Welcome to the archived todos section{" "}
+        <span>
+          <Archive size={25} className="inline" />
+        </span>
+      </h4>
       {archived.length === 0 ? (
         <h4>no archived notes</h4>
       ) : (
@@ -21,19 +36,38 @@ const Archived = () => {
                 <li>
                   {everyEl.todo_title}:{everyEl.todo_details}
                 </li>
+                {everyEl.isCompleted ? (
+                  <button
+                    onClick={() => {
+                      transferExistingTodosBetweenCompletedAndArchives(everyEl);
+                    }}
+                  >
+                    <FillCheck />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      transferExistingTodosBetweenArchivesAndPending(everyEl);
+                    }}
+                  >
+                    <Pending size={25} />
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
-                    transferExistingTodosBetweenArchivesAndPending(everyEl);
+                    openModal();
+                    updateTodoSelected(everyEl);
                   }}
                 >
-                  Restore
+                  <Edit size={25} />
                 </button>
                 <button
                   onClick={() => {
                     deleteExistingTodo(everyEl);
                   }}
                 >
-                  DELETE
+                  <Delete color="red" size={25} />
                 </button>
               </div>
             );

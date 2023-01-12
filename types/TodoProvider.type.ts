@@ -1,4 +1,5 @@
-import { EveryTodo } from "../types/todo.types";
+import React, { Dispatch, SetStateAction } from "react";
+import { EveryTodo } from "./todo.types";
 interface GlobalStateInterface {
   pending: EveryTodo[];
   archived: EveryTodo[];
@@ -7,6 +8,10 @@ interface GlobalStateInterface {
 
 interface TodoProvider {
   globalState: GlobalStateInterface;
+  todoSelected: EveryTodo;
+  editTodoSelected: Dispatch<SetStateAction<EveryTodo>>;
+  editExistingTodo: (todoGiven: EveryTodo) => void;
+  updateTodoSelected: (todoGiven: EveryTodo) => void;
   addNewTodo: (todoGiven: EveryTodo) => void;
   deleteExistingTodo: (todoGiven: EveryTodo) => void;
   transferExistingTodosBetweenArchivesAndPending: (
@@ -20,4 +25,4 @@ interface TodoProvider {
   ) => void;
 }
 
-export type { GlobalStateInterface,TodoProvider };
+export type { GlobalStateInterface, TodoProvider };

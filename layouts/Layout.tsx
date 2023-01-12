@@ -1,5 +1,6 @@
-import React from "react";
-import { LinksGroup } from "../components/LinksGroup";
+import React, { useState } from "react";
+import { EditForm, LinksGroup } from "../components/";
+
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <main className="bg-sky-50 min-h-screen flex flex-col">
@@ -10,6 +11,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <LinksGroup />
         <div>{children}</div>
       </div>
+      <EditForm />
     </main>
   );
 };

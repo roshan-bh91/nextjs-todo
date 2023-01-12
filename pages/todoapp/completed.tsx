@@ -1,5 +1,6 @@
-import { useTodos } from "../../context/TodosProvider";
-import { EveryTodo } from "../../types/todo.types";
+import { useModal, useTodos } from "../../context/";
+import { Archive, Delete, Edit, FillCheck, Pending } from "../../icons";
+import { EveryTodo } from "../../types/";
 
 const Completed = () => {
   const {
@@ -7,10 +8,14 @@ const Completed = () => {
     transferExistingTodosBetweenPendingAndCompleted,
     transferExistingTodosBetweenCompletedAndArchives,
     deleteExistingTodo,
+    updateTodoSelected,
   } = useTodos();
+  const { openModal } = useModal();
   return (
     <>
-      <h4>Welcome to the completed todos section</h4>
+      <h4>
+        Welcome to the completed todos section <FillCheck size={25} />
+      </h4>
       <div>
         {completed.length === 0 ? (
           <h4>No todos yet</h4>
@@ -25,19 +30,35 @@ const Completed = () => {
                   <li>
                     {everyEl.todo_title}:{everyEl.todo_details}
                   </li>
-                  <button onClick={() => {}}>Archive</button>
+                  <button
+                    onClick={() => {
+                      transferExistingTodosBetweenCompletedAndArchives(everyEl);
+                    }}
+                  >
+                    <Archive />
+                  </button>
                   <button
                     onClick={() => {
                       transferExistingTodosBetweenPendingAndCompleted(everyEl);
                     }}
                   >
-                    Restore
+                    <Pending />
+                  </button>
+                  <button
+                    onClick={() => {
+                      openModal();
+                      updateTodoSelected(everyEl);
+                    }}
+                  >
+                    <Edit />
                   </button>
                   <button
                     onClick={() => {
                       deleteExistingTodo(everyEl);
                     }}
-                  >DELETE</button>
+                  >
+                    <Delete />
+                  </button>
                 </div>
               );
             })}

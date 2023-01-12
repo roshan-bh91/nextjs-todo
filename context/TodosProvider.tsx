@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import { EveryTodo } from "../types/todo.types";
-import { GlobalStateInterface, TodoProvider } from "./TodoProvider.type";
+import { GlobalStateInterface, TodoProvider } from "../types/TodoProvider.type";
 
 const TodosContext = createContext<TodoProvider>({} as TodoProvider);
 const initialState = {
@@ -11,13 +11,63 @@ const initialState = {
 const TodosProvider = ({ children }: { children: React.ReactNode }) => {
   const [globalState, updateGlobalState] =
     useState<GlobalStateInterface>(initialState);
+  const [todoSelected, editTodoSelected] = useState({} as EveryTodo);
   const addNewTodo = (currentTodoDetails: EveryTodo) => {
     updateGlobalState((prev) => ({
       ...prev,
       pending: [...prev.pending, { ...currentTodoDetails }],
     }));
   };
-  const editExistingTodo = () => {};
+  const updateTodoSelected = (todoReceived: EveryTodo) => {
+    editTodoSelected((prev) => ({ ...prev, ...todoReceived }));
+  };
+  const editExistingTodo = (todoReceived: EveryTodo) => {
+    const {
+      pending: pendingTodos,
+      completed: completedTodos,
+      archived: archivedTodos,
+    } = globalState;
+    const checkTodoInPending = pendingTodos.some(
+      (everyTodo: EveryTodo) => everyTodo.todo_id === todoReceived.todo_id
+    );
+    const checkTodoInCompleted = completedTodos.some(
+      (everyTodo: EveryTodo) => everyTodo.todo_id === todoReceived.todo_id
+    );
+    const checkTodoInArchived = archivedTodos.some(
+      (everyTodo: EveryTodo) => everyTodo.todo_id === todoReceived.todo_id
+    );
+    if (checkTodoInPending) {
+      const modifiedPendingTodosList = pendingTodos.map((everyTodo) =>
+        everyTodo.todo_id === todoReceived.todo_id
+          ? { ...todoReceived }
+          : { ...everyTodo }
+      );
+      updateGlobalState((prev) => ({
+        ...prev,
+        pending: modifiedPendingTodosList,
+      }));
+    } else if (checkTodoInCompleted) {
+      const modifiedCompletedTodosList = completedTodos.map((everyTodo) =>
+        everyTodo.todo_id === todoReceived.todo_id
+          ? { ...todoReceived }
+          : { ...everyTodo }
+      );
+      updateGlobalState((prev) => ({
+        ...prev,
+        completed: modifiedCompletedTodosList,
+      }));
+    } else if (checkTodoInArchived) {
+      const modifiedArchivedTodosList = archivedTodos.map((everyTodo) =>
+        everyTodo.todo_id === todoReceived.todo_id
+          ? { ...todoReceived }
+          : { ...everyTodo }
+      );
+      updateGlobalState((prev) => ({
+        ...prev,
+        archived: modifiedArchivedTodosList,
+      }));
+    }
+  };
   const deleteExistingTodo = (todoReceived: EveryTodo) => {
     const {
       pending: pendingTodos,
@@ -108,20 +158,59 @@ const TodosProvider = ({ children }: { children: React.ReactNode }) => {
     todoReceived: EveryTodo
   ) => {
     const { completed: completedTodos, archived: archivedTodos } = globalState;
-    const modifiedCompletedTodosList = completedTodos
-      .map((everyTodo: EveryTodo) =>
-        everyTodo.todo_id === todoReceived.todo_id
-          ? { ...todoReceived, isCompleted: !todoReceived.isCompleted }
-          : { ...everyTodo }
-      )
-      .filter((everyTodo) => everyTodo.isCompleted && !everyTodo.isArchived);
-    const modifiedArchivedTodosList = archivedTodos
-      .map((everyTodo: EveryTodo) =>
-        everyTodo.todo_id === todoReceived.todo_id
-          ? { ...todoReceived, isArchived: !everyTodo.isArchived }
-          : { ...everyTodo }
-      )
-      .filter((everyTodo) => everyTodo.isArchived && !everyTodo.isCompleted);
+    const checkTodoInCompleted = completedTodos.some(
+      (everyTodo: EveryTodo) => everyTodo.todo_id === todoReceived.todo_id
+    );
+    const checkTodoInArchived = archivedTodos.some(
+      (everyTodo: EveryTodo) => everyTodo.todo_id === todoReceived.todo_id
+    );
+    if (checkTodoInCompleted) {
+      const modifiedCompletedTodosList = completedTodos
+        .map((everyTodo: EveryTodo) =>
+          todoReceived.todo_id === everyTodo.todo_id
+            ? { ...todoReceived, isArchived: !todoReceived.isArchived }
+            : { ...everyTodo }
+        )
+        .filter(
+          (everyTodo: EveryTodo) =>
+            everyTodo.isCompleted && !everyTodo.isArchived
+        );
+      const modifiedArchivedTodosList = completedTodos
+        .map((everyTodo: EveryTodo) =>
+          todoReceived.todo_id === everyTodo.todo_id
+            ? { ...todoReceived, isArchived: !todoReceived.isArchived }
+            : { ...everyTodo }
+        )
+        .filter((everyTodo: EveryTodo) => everyTodo.isArchived);
+      updateGlobalState((prev) => ({
+        ...prev,
+        completed: modifiedCompletedTodosList,
+        archived: [...prev.archived, ...modifiedArchivedTodosList],
+      }));
+    } else if (checkTodoInArchived) {
+      const modifiedCompletedTodosList = archivedTodos
+        .map((everyTodo: EveryTodo) =>
+          todoReceived.todo_id === everyTodo.todo_id
+            ? { ...todoReceived, isArchived: !todoReceived.isArchived }
+            : { ...everyTodo }
+        )
+        .filter(
+          (everyTodo: EveryTodo) =>
+            everyTodo.isCompleted && !everyTodo.isArchived
+        );
+      const modifiedArchivedTodosList = archivedTodos
+        .map((everyTodo: EveryTodo) =>
+          todoReceived.todo_id === everyTodo.todo_id
+            ? { ...todoReceived, isArchived: !todoReceived.isArchived }
+            : { ...everyTodo }
+        )
+        .filter((everyTodo: EveryTodo) => everyTodo.isArchived);
+      updateGlobalState((prev) => ({
+        ...prev,
+        completed: [...prev.completed, ...modifiedCompletedTodosList],
+        archived: modifiedArchivedTodosList,
+      }));
+    }
   };
   const transferExistingTodosBetweenPendingAndCompleted = (
     todoReceived: EveryTodo
@@ -179,7 +268,11 @@ const TodosProvider = ({ children }: { children: React.ReactNode }) => {
     <TodosContext.Provider
       value={{
         globalState,
+        todoSelected,
+        editTodoSelected,
+        updateTodoSelected,
         addNewTodo,
+        editExistingTodo,
         deleteExistingTodo,
         transferExistingTodosBetweenArchivesAndPending,
         transferExistingTodosBetweenCompletedAndArchives,

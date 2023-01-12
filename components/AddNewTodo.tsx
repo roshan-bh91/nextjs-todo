@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useTodos } from "../context/TodosProvider";
-import { FormData } from "../types/todo.types";
+import { useTodos } from "../context";
+import { FormData } from "../types/";
 
 const AddNewTodo = () => {
   const initialFormData: FormData = {
@@ -31,9 +31,9 @@ const AddNewTodo = () => {
           submitEvent.preventDefault();
           if (
             current_todo_title !== "" &&
-            current_todo_title.trim() !== "" &&
+            current_todo_title?.trim() !== "" &&
             current_todo_details !== "" &&
-            current_todo_details.trim() !== ""
+            current_todo_details?.trim() !== ""
           ) {
             addNewTodo({ todo_id: crypto.randomUUID(), ...formData });
             updateFormData(initialFormData);
